@@ -1,18 +1,20 @@
 # Импорт встроенной библиотеки для работы веб-сервера
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from urllib.parse import parse_qs, unquote_plus
+from urllib.parse import parse_qs
 
 # Для начала определим настройки запуска
-hostName = "localhost" # Адрес для доступа по сети
-serverPort = 8080 # Порт для доступа по сети
+hostName = "localhost"  # Адрес для доступа по сети
+serverPort = 8080  # Порт для доступа по сети
+
 
 class MyServer(BaseHTTPRequestHandler):
     """
-        Специальный класс, который отвечает за
-        обработку входящих запросов от клиентов
+    Специальный класс, который отвечает за
+    обработку входящих запросов от клиентов
     """
-    def do_GET(self):
-        """ Метод для обработки входящих GET-запросов """
+
+    def do_GET(self) -> None:
+        """Метод для обработки входящих GET-запросов"""
         with open("contacts.html", "r", encoding="utf-8") as file:
             content = file.read()
         self.send_response(200)
@@ -20,13 +22,16 @@ class MyServer(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(content.encode("utf-8"))
 
-    def do_POST(self):
+    def do_POST(self) -> None:
         """Метод для обработки входящих POST-запросов"""
         content_length = int(self.headers["Content-Length"])  # Получаем длину данных
         body = self.rfile.read(content_length)  # Читаем данные из потока
         body_str = body.decode("utf-8")
-        params = parse_qs(body_str) # Парсим параметры из URL-кодированной строки
-        answer_post = f"Имя: {params.get("name", ["no data"])[0]}\nEmail: {params.get("email", ["no data"])[0]}\nСообщение: {params.get("message", ["no data"])[0]}"
+        params = parse_qs(body_str)  # Парсим параметры из URL-кодированной строки
+        answer_post = (
+            f"Имя: {params.get("name", ["no data"])[0]}\nEmail: {params.get("email", ["no data"])[0]}"
+            f"\nСообщение: {params.get("message", ["no data"])[0]}"
+        )
         print("Полученные данные от пользователя:")
         print(answer_post)
         self.send_response(303)  # HTTP 303 See Other
